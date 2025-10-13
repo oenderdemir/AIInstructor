@@ -20,6 +20,7 @@ using AIInstructor.src.Shared.Filters;
 using AIInstructor.src.Shared.Middleware;
 
 using AIInstructor.src.Shared.SignalRHubs;
+using AIInstructor.src.TrainingScenarios.Service;
 
 
 Log.Logger = new LoggerConfiguration()
@@ -86,6 +87,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddServicesAndRepositoriesFromAssembly(Assembly.GetExecutingAssembly());
+builder.Services.AddHttpClient(nameof(OpenAIChatClient));
+builder.Services.Configure<OpenAIOptions>(configuration.GetSection("OpenAI"));
 //builder.Services.AddScoped<ICurrentUserService,CurrentUserService>();
 
 

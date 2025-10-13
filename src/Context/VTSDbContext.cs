@@ -9,6 +9,7 @@ using AIInstructor.src.MenuItemRoller.Entity;
 using AIInstructor.src.Roller.Entity;
 using AIInstructor.src.Shared.CurrentUser.Service;
 using AIInstructor.src.Shared.RDBMS.Entity;
+using AIInstructor.src.TrainingScenarios.Entity;
 
 namespace AIInstructor.src.Context
 {
@@ -74,6 +75,12 @@ namespace AIInstructor.src.Context
         public DbSet<KullaniciGrupRol> KullaniciGrupRoller { get; set; }
         public DbSet<MenuItem> MenuItemler { get; set; }
         public DbSet<MenuItemRol> MenuItemRoller { get; set; }
+        public DbSet<TrainingScenario> TrainingScenarios { get; set; }
+        public DbSet<ScenarioSession> ScenarioSessions { get; set; }
+        public DbSet<ScenarioMessage> ScenarioMessages { get; set; }
+        public DbSet<ScenarioEvaluation> ScenarioEvaluations { get; set; }
+        public DbSet<StudentGamificationProfile> StudentGamificationProfiles { get; set; }
+        public DbSet<EarnedBadge> EarnedBadges { get; set; }
     
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -99,6 +106,44 @@ namespace AIInstructor.src.Context
             modelBuilder.Entity<KullaniciGrup>(entity =>
             {
                 entity.HasIndex(e => e.Ad).IsUnique();
+            });
+
+            modelBuilder.Entity<TrainingScenario>(entity =>
+            {
+                entity.Property(e => e.Language).HasMaxLength(50).HasDefaultValue("tr-TR");
+            });
+
+            modelBuilder.Entity<ScenarioSession>(entity =>
+            {
+                entity.HasOne(session => session.Scenario)
+                    .WithMany(scenario => scenario.Sessions)
+                    .HasForeignKey(session => session.ScenarioId);
+            });
+
+            modelBuilder.Entity<ScenarioMessage>(entity =>
+            {
+                entity.HasOne(message => message.Session)
+                    .WithMany(session => session.Messages)
+                    .HasForeignKey(message => message.SessionId);
+            });
+
+            modelBuilder.Entity<ScenarioEvaluation>(entity =>
+            {
+                entity.HasOne(evaluation => evaluation.Session)
+                    .WithOne(session => session.Evaluation)
+                    .HasForeignKey<ScenarioEvaluation>(evaluation => evaluation.SessionId);
+            });
+
+            modelBuilder.Entity<StudentGamificationProfile>(entity =>
+            {
+                entity.HasIndex(profile => profile.StudentId).IsUnique();
+            });
+
+            modelBuilder.Entity<EarnedBadge>(entity =>
+            {
+                entity.HasOne(badge => badge.GamificationProfile)
+                    .WithMany(profile => profile.Badges)
+                    .HasForeignKey(badge => badge.GamificationProfileId);
             });
 
             
