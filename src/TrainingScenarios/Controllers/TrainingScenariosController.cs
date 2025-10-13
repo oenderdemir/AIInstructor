@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using AIInstructor.src.TrainingScenarios.DTO;
 using AIInstructor.src.TrainingScenarios.Entity;
 using AIInstructor.src.TrainingScenarios.Repository;
@@ -31,15 +29,7 @@ public sealed class TrainingScenariosController : ControllerBase
     public async Task<IActionResult> GetScenarios(CancellationToken cancellationToken)
     {
         var scenarios = await _scenarioRepository.GetAllAsync(cancellationToken);
-        var summaries = scenarios.Select(s => new ScenarioSummaryDto
-        {
-            ScenarioCode = s.ScenarioCode,
-            Title = s.Title,
-            Description = s.Description,
-            Difficulty = s.Difficulty,
-            Language = s.Language,
-            Tags = s.Tags.ToList()
-        }).ToList();
+        var summaries = scenarios.Select(s => new ScenarioSummaryDto(s.Id, s.Title, s.Description, s.Difficulty, s.Language, s.Tags.ToList())).ToList();
         return Ok(summaries);
     }
 

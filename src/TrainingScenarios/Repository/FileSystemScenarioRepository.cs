@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Concurrent;
 using System.Text.Json;
-using System.Threading;
 using AIInstructor.src.TrainingScenarios.Entity;
 using Microsoft.Extensions.Options;
 
@@ -39,7 +37,7 @@ public sealed class FileSystemScenarioRepository : IScenarioRepository
         }
 
         var scenarios = await _lazyInitializer.Value.ConfigureAwait(false);
-        var scenario = scenarios.FirstOrDefault(s => string.Equals(s.ScenarioCode, id, StringComparison.OrdinalIgnoreCase));
+        var scenario = scenarios.FirstOrDefault(s => string.Equals(s.Id, id, StringComparison.OrdinalIgnoreCase));
         if (scenario is not null)
         {
             _cache[id] = scenario;
@@ -72,10 +70,7 @@ public sealed class FileSystemScenarioRepository : IScenarioRepository
             if (definition is not null)
             {
                 scenarios.Add(definition);
-                if (!string.IsNullOrWhiteSpace(definition.ScenarioCode))
-                {
-                    _cache[definition.ScenarioCode] = definition;
-                }
+                _cache[definition.Id] = definition;
             }
         }
 

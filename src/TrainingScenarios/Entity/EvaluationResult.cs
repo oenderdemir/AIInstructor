@@ -1,16 +1,7 @@
-using System;
-using System.Collections.Generic;
-using AIInstructor.src.Shared.RDBMS.Entity;
-
 namespace AIInstructor.src.TrainingScenarios.Entity;
 
-public sealed class EvaluationResult : BaseEntity
+public sealed class EvaluationResult
 {
-    public EvaluationResult()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public required double Communication { get; init; }
 
     public required double ProblemSolving { get; init; }
@@ -26,13 +17,8 @@ public sealed class EvaluationResult : BaseEntity
     public required string ImprovementAreas { get; init; }
 }
 
-public sealed class GamificationProfile : BaseEntity
+public sealed class GamificationProfile
 {
-    public GamificationProfile()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public required string StudentId { get; init; }
 
     public int TotalPoints { get; set; }
@@ -44,13 +30,8 @@ public sealed class GamificationProfile : BaseEntity
     public List<ScenarioHistoryEntry> CompletedScenarios { get; } = new();
 }
 
-public sealed class ScenarioHistoryEntry : BaseEntity
+public sealed class ScenarioHistoryEntry
 {
-    public ScenarioHistoryEntry()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public required string ScenarioId { get; init; }
 
     public required double Score { get; init; }

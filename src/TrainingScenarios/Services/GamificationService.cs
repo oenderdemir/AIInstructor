@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 using AIInstructor.src.TrainingScenarios.Entity;
 using Microsoft.Extensions.Logging;
@@ -38,13 +37,13 @@ public sealed class GamificationService : IGamificationService
 
         profile.CompletedScenarios.Add(new ScenarioHistoryEntry
         {
-            ScenarioId = scenario.ScenarioCode,
+            ScenarioId = scenario.Id,
             Score = evaluation.OverallScore,
             CompletedAt = DateTimeOffset.UtcNow,
             EarnedBadges = earnedBadges
         });
 
-        _logger.LogInformation("Student {StudentId} completed scenario {ScenarioId} with score {Score}", session.StudentId, scenario.ScenarioCode, evaluation.OverallScore);
+        _logger.LogInformation("Student {StudentId} completed scenario {ScenarioId} with score {Score}", session.StudentId, scenario.Id, evaluation.OverallScore);
 
         return Task.FromResult(profile);
     }

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Text;
 using AIInstructor.src.TrainingScenarios.DTO;
 using AIInstructor.src.TrainingScenarios.Entity;
@@ -51,7 +49,7 @@ public sealed class ScenarioSessionService : IScenarioSessionService
         var session = new ScenarioSession
         {
             Id = Guid.NewGuid(),
-            ScenarioId = scenario.ScenarioCode,
+            ScenarioId = scenario.Id,
             StudentId = studentId,
             MaxTurns = scenario.MaxTurns,
             CurrentTurn = 0,
@@ -70,14 +68,7 @@ public sealed class ScenarioSessionService : IScenarioSessionService
         _sessions[session.Id] = session;
 
         var summary = MapToSummary(scenario);
-        return new StartScenarioResponse
-        {
-            SessionId = session.Id,
-            Scenario = summary,
-            TutorMessage = tutorIntro,
-            CurrentTurn = session.CurrentTurn,
-            MaxTurns = scenario.MaxTurns
-        };
+        return new StartScenarioResponse(session.Id, summary, tutorIntro, session.CurrentTurn, scenario.MaxTurns);
     }
 
     public async Task<ScenarioTurnResponse> SubmitStudentMessageAsync(Guid sessionId, string studentId, string message, CancellationToken cancellationToken = default)
@@ -95,16 +86,7 @@ public sealed class ScenarioSessionService : IScenarioSessionService
         if (session.IsCompleted)
         {
             var transcriptResponse = await GetTranscriptAsync(sessionId, cancellationToken) ?? throw new InvalidOperationException("Transcript unavailable.");
-            return new ScenarioTurnResponse
-            {
-                SessionId = sessionId,
-                TutorMessage = string.Empty,
-                CurrentTurn = session.CurrentTurn,
-                MaxTurns = session.MaxTurns,
-                IsCompleted = true,
-                Evaluation = transcriptResponse.Evaluation,
-                GamificationProfile = null
-            };
+            return new ScenarioTurnResponse(sessionId, string.Empty, session.CurrentTurn, session.MaxTurns, true, transcriptResponse.Evaluation, null);
         }
 
         session.Transcript.Add(new ScenarioMessage { Role = "user", Content = message });
@@ -120,16 +102,7 @@ public sealed class ScenarioSessionService : IScenarioSessionService
             return await FinalizeScenarioAsync(session, scenario, tutorResponse, cancellationToken);
         }
 
-        return new ScenarioTurnResponse
-        {
-            SessionId = session.Id,
-            TutorMessage = tutorResponse,
-            CurrentTurn = session.CurrentTurn,
-            MaxTurns = scenario.MaxTurns,
-            IsCompleted = false,
-            Evaluation = null,
-            GamificationProfile = null
-        };
+        return new ScenarioTurnResponse(session.Id, tutorResponse, session.CurrentTurn, scenario.MaxTurns, false, null, null);
     }
 
     public async Task<ScenarioTurnResponse> CompleteScenarioAsync(Guid sessionId, string studentId, CancellationToken cancellationToken = default)
@@ -147,16 +120,7 @@ public sealed class ScenarioSessionService : IScenarioSessionService
         if (session.IsCompleted)
         {
             var transcript = await GetTranscriptAsync(sessionId, cancellationToken) ?? throw new InvalidOperationException("Transcript unavailable.");
-            return new ScenarioTurnResponse
-            {
-                SessionId = session.Id,
-                TutorMessage = string.Empty,
-                CurrentTurn = session.CurrentTurn,
-                MaxTurns = session.MaxTurns,
-                IsCompleted = true,
-                Evaluation = transcript.Evaluation,
-                GamificationProfile = null
-            };
+            return new ScenarioTurnResponse(session.Id, string.Empty, session.CurrentTurn, session.MaxTurns, true, transcript.Evaluation, null);
         }
 
         var scenario = await _scenarioRepository.GetByIdAsync(session.ScenarioId, cancellationToken) ?? throw new InvalidOperationException("Scenario not found for session.");
@@ -172,12 +136,7 @@ public sealed class ScenarioSessionService : IScenarioSessionService
 
         var transcript = session.Transcript
             .Where(m => !string.Equals(m.Role, "system", StringComparison.OrdinalIgnoreCase))
-            .Select(m => new ScenarioTranscriptEntry
-            {
-                Role = m.Role,
-                Content = m.Content,
-                Timestamp = m.Timestamp
-            })
+            .Select(m => new ScenarioTranscriptEntry(m.Role, m.Content, m.Timestamp))
             .ToList();
 
         var evaluation = session.IsCompleted ? session.Transcript
@@ -185,13 +144,7 @@ public sealed class ScenarioSessionService : IScenarioSessionService
             .Select(m => System.Text.Json.JsonSerializer.Deserialize<EvaluationResult>(m.Content, new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)))
             .LastOrDefault() : null;
 
-        return Task.FromResult<ScenarioTranscriptResponse?>(new ScenarioTranscriptResponse
-        {
-            SessionId = session.Id,
-            ScenarioCode = session.ScenarioId,
-            Transcript = transcript,
-            Evaluation = evaluation
-        });
+        return Task.FromResult<ScenarioTranscriptResponse?>(new ScenarioTranscriptResponse(session.Id, session.ScenarioId, transcript, evaluation));
     }
 
     private async Task<ScenarioTurnResponse> FinalizeScenarioAsync(ScenarioSession session, ScenarioDefinition scenario, string lastTutorMessage, CancellationToken cancellationToken)
@@ -210,35 +163,24 @@ public sealed class ScenarioSessionService : IScenarioSessionService
                 Content = System.Text.Json.JsonSerializer.Serialize(evaluation, new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web))
             });
 
-            return new ScenarioTurnResponse
-            {
-                SessionId = session.Id,
-                TutorMessage = lastTutorMessage,
-                CurrentTurn = session.CurrentTurn,
-                MaxTurns = scenario.MaxTurns,
-                IsCompleted = true,
-                Evaluation = evaluation,
-                GamificationProfile = gamification
-            };
+            return new ScenarioTurnResponse(session.Id, lastTutorMessage, session.CurrentTurn, scenario.MaxTurns, true, evaluation, gamification);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to finalize scenario {ScenarioId} for session {SessionId}", scenario.ScenarioCode, session.Id);
+            _logger.LogError(ex, "Failed to finalize scenario {ScenarioId} for session {SessionId}", scenario.Id, session.Id);
             throw;
         }
     }
 
     private static ScenarioSummaryDto MapToSummary(ScenarioDefinition scenario)
     {
-        return new ScenarioSummaryDto
-        {
-            ScenarioCode = scenario.ScenarioCode,
-            Title = scenario.Title,
-            Description = scenario.Description,
-            Difficulty = scenario.Difficulty,
-            Language = scenario.Language,
-            Tags = scenario.Tags.ToList()
-        };
+        return new ScenarioSummaryDto(
+            scenario.Id,
+            scenario.Title,
+            scenario.Description,
+            scenario.Difficulty,
+            scenario.Language,
+            scenario.Tags.ToList());
     }
 
     private static string BuildSystemPrompt(ScenarioDefinition scenario)

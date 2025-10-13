@@ -1,15 +1,8 @@
-using System;
-using System.Collections.Generic;
-using AIInstructor.src.Shared.RDBMS.Entity;
-
 namespace AIInstructor.src.TrainingScenarios.Entity;
 
-public sealed class ScenarioSession : BaseEntity
+public sealed class ScenarioSession
 {
-    public ScenarioSession()
-    {
-        Id = Guid.NewGuid();
-    }
+    public required Guid Id { get; init; }
 
     public required string ScenarioId { get; init; }
 
@@ -28,13 +21,8 @@ public sealed class ScenarioSession : BaseEntity
     public List<ScenarioMessage> Transcript { get; } = new();
 }
 
-public sealed class ScenarioMessage : BaseEntity
+public sealed class ScenarioMessage
 {
-    public ScenarioMessage()
-    {
-        Id = Guid.NewGuid();
-    }
-
     public required string Role { get; init; }
 
     public required string Content { get; init; }

@@ -1,19 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using AIInstructor.src.Shared.RDBMS.Entity;
 
 namespace AIInstructor.src.TrainingScenarios.Entity;
 
-public sealed class ScenarioDefinition : BaseEntity
+public sealed class ScenarioDefinition
 {
-    public ScenarioDefinition()
-    {
-        Id = Guid.NewGuid();
-    }
-
     [JsonPropertyName("id")]
-    public required string ScenarioCode { get; init; }
+    public required string Id { get; init; }
 
     [JsonPropertyName("title")]
     public required string Title { get; init; }
@@ -46,13 +38,8 @@ public sealed class ScenarioDefinition : BaseEntity
     public IReadOnlyCollection<string> SuccessCriteria { get; init; } = Array.Empty<string>();
 }
 
-public sealed class CustomerProfile : BaseEntity
+public sealed class CustomerProfile
 {
-    public CustomerProfile()
-    {
-        Id = Guid.NewGuid();
-    }
-
     [JsonPropertyName("name")]
     public required string Name { get; init; }
 
@@ -66,13 +53,8 @@ public sealed class CustomerProfile : BaseEntity
     public string PreferredLanguage { get; init; } = "en";
 }
 
-public sealed class ScenarioStep : BaseEntity
+public sealed class ScenarioStep
 {
-    public ScenarioStep()
-    {
-        Id = Guid.NewGuid();
-    }
-
     [JsonPropertyName("order")]
     public required int Order { get; init; }
 
