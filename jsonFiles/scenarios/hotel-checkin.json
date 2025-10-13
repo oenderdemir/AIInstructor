@@ -1,0 +1,63 @@
+{
+  "id": "hotel-checkin-basic",
+  "title": "Yoğun Saatte Otel Check-in",
+  "description": "Öğrenci, yoğun saatlerde gelen yorgun bir müşterinin check-in sürecini yönetir.",
+  "language": "tr",
+  "difficulty": "Orta",
+  "tags": ["resepsiyon", "check-in", "iletişim"],
+  "maxTurns": 6,
+  "successCriteria": [
+    "Müşteri ihtiyaçlarını aktif dinleme",
+    "Oda seçeneklerini net bir şekilde açıklama",
+    "Profesyonel ve nazik iletişim sürdürme"
+  ],
+  "goals": [
+    "Müşterinin isteği doğrultusunda hızlı bir check-in sağlamak",
+    "Müşterinin yorgunluğunu azaltacak çözümler sunmak",
+    "Gerekirse üst satış fırsatlarını nazikçe önermek"
+  ],
+  "customerProfile": {
+    "name": "Emily Carter",
+    "background": "İş seyahatinde olan, uzun uçuş sonrası otele geç gelen bir yönetici.",
+    "personalityTraits": [
+      "Yorgun",
+      "Profesyonel",
+      "Sabırsız"
+    ],
+    "preferredLanguage": "en"
+  },
+  "steps": [
+    {
+      "order": 1,
+      "tutorPrompt": "Müşteri role-play'ine nazik bir karşılama ile başla, öğrenciden rezervasyon bilgilerini talep et.",
+      "expectedStudentActions": [
+        "Güleryüzlü karşılama",
+        "Rezervasyon adı ve kimlik bilgilerini isteme"
+      ]
+    },
+    {
+      "order": 2,
+      "tutorPrompt": "Uçuş gecikmesi yüzünden müşterinin sinirli olduğunu belirt, oda hazır değilse çözüm iste.",
+      "expectedStudentActions": [
+        "Empati kurma",
+        "Alternatif çözüm veya bekleme sırasında ikram önerme"
+      ]
+    },
+    {
+      "order": 3,
+      "tutorPrompt": "Üst satış fırsatı yaratmak için sessiz bir köşe oda veya lounge erişimi öner.",
+      "expectedStudentActions": [
+        "Üst satış teklifini profesyonel sunma",
+        "Avantajları açıklama"
+      ]
+    },
+    {
+      "order": 4,
+      "tutorPrompt": "Ödeme ve oda kartı teslimi sırasında gerekli detayları paylaş.",
+      "expectedStudentActions": [
+        "Ödeme yöntemini netleştirme",
+        "Kahvaltı ve diğer hizmetleri hatırlatma"
+      ]
+    }
+  ]
+}

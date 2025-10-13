@@ -20,6 +20,8 @@ using AIInstructor.src.Shared.Filters;
 using AIInstructor.src.Shared.Middleware;
 
 using AIInstructor.src.Shared.SignalRHubs;
+using AIInstructor.src.TrainingScenarios.Repository;
+using AIInstructor.src.TrainingScenarios.Services;
 
 
 Log.Logger = new LoggerConfiguration()
@@ -91,6 +93,15 @@ builder.Services.AddServicesAndRepositoriesFromAssembly(Assembly.GetExecutingAss
 
 builder.Services.AddSignalR();
 builder.Services.AddMemoryCache();
+
+builder.Services.Configure<OpenAIOptions>(configuration.GetSection("OpenAI"));
+builder.Services.Configure<ScenarioDataOptions>(configuration.GetSection("ScenarioData"));
+
+builder.Services.AddSingleton<IScenarioRepository, FileSystemScenarioRepository>();
+builder.Services.AddSingleton<IGamificationService, GamificationService>();
+builder.Services.AddSingleton<IEvaluationService, EvaluationService>();
+builder.Services.AddSingleton<IScenarioSessionService, ScenarioSessionService>();
+builder.Services.AddHttpClient<IOpenAIChatClient, OpenAIChatClient>();
 
 
 
