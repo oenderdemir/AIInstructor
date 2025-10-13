@@ -1,0 +1,116 @@
+<div class="p-m-4">
+    <p-button *ngIf="authService.hasRole('MenuYonetimi.Manage')" label="Yeni Menü Ekle" severity="success" icon="pi pi-plus" (onClick)="openNew()"></p-button>
+    <p-divider type="solid" />
+    <p-toast />
+    <p-confirmdialog />
+  
+    <p-treeTable [value]="treeMenuItems" tableStyleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Label</th>
+            <th>Icon</th>
+            <th>Router Link</th>
+            <th>Menu Order</th>
+            <th *ngIf="authService.hasRole('MenuYonetimi.Manage')">İşlemler</th>
+          </tr>
+        </ng-template>
+      
+        <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+          <tr [ttRow]="rowNode">
+            <td>
+                <p-treetable-toggler [rowNode]="rowNode" />
+                {{ rowData.label }}
+            </td>
+            <td><i [class]="rowData.icon"></i> {{ rowData.icon }}</td>
+            <td>{{ rowData.routerLink }}</td>
+            <td>{{ rowData.menuOrder }}</td>
+
+            <td class="flex gap-1" *ngIf="authService.hasRole('MenuYonetimi.Manage')">
+                <p-button *ngIf="!rowData.parentId"  severity="success" icon="pi pi-plus" (onClick)="openNewChild(rowData.id)" class="p-button-sm"  [ngStyle]="{'padding': '0.1rem 0.1rem'}" ></p-button>
+                <p-button severity="info"  icon="pi pi-pencil" (onClick)="editMenuItem(rowData)" class="p-button-sm"  [ngStyle]="{'padding': '0.1rem 0.1rem'}"></p-button>
+                <p-button  *ngIf="!hasChild(rowNode.node)"  severity="danger"  icon="pi pi-trash" (onClick)="deleteMenuItem(rowData)" class="p-button-sm " [ngStyle]="{'padding': '0.1rem 0.1rem'}"></p-button>
+            
+              </td>
+          </tr>
+        </ng-template>
+      </p-treeTable>
+      
+    
+  
+      <p-dialog header="{{ isEditMode ? 'Menü Düzenle' : 'Yeni Menü Ekle' }}" [(visible)]="displayDialog" [modal]="true" [style]="{ width: '600px' }" [breakpoints]="{'960px': '75vw', '640px': '90vw'}">
+
+        <p-tabView>
+          <!-- Menü Bilgileri Tabı -->
+          <p-tabPanel header="Menü Bilgileri">
+            <div class="p-fluid formgrid grid p-3">
+              <div class="field col-12">
+                <label for="label">Label</label>
+                <input id="label" pInputText [(ngModel)]="selectedMenuItem.label" class="w-full" />
+              </div>
+          
+              <div class="field col-12">
+                <label for="icon">Icon</label>
+                <div class="flex items-center gap-2">
+                    <i [class]="selectedMenuItem.icon"></i>
+                    <input id="icon" pInputText [(ngModel)]="selectedMenuItem.icon" class="w-full" />
+                </div>
+              </div>
+          
+              <div class="field col-12">
+                <label for="routerLink">Router Link</label>
+                <input id="routerLink" pInputText [(ngModel)]="selectedMenuItem.routerLink" class="w-full" />
+              </div>
+          
+              <div class="field col-6">
+                <label for="menuOrder">Menu Order</label>
+                <input id="menuOrder" pInputText type="number" [(ngModel)]="selectedMenuItem.menuOrder" class="w-full" />
+              </div>
+          
+              <div class="field col-6">
+                <label for="parentId">Üst Menü Seçimi</label>
+                <p-dropdown 
+                  id="parentId"
+                  [options]="parentMenus"
+                  optionLabel="label"
+                  optionValue="id"
+                  [(ngModel)]="selectedParentId"
+                  placeholder="Üst Menü Seçiniz (Opsiyonel)"
+                  class="w-full"
+                  appendTo="body"
+                  [filter]="true">
+                </p-dropdown>
+              </div>
+            </div>
+          </p-tabPanel>
+      
+          <!-- Yetkiler Tabı -->
+          <p-tabPanel header="Yetkiler">
+            <div class="p-fluid p-3">
+              <label for="roles">Menüyü görebilecek roller</label>
+              <p-multiSelect 
+                id="roles"
+                [options]="allRoles" 
+                optionLabel="name" 
+                optionValue="id"
+                [(ngModel)]="selectedRoles"
+                placeholder="Rolleri Seçiniz"
+                class="w-full"
+                appendTo="body"
+                display="chip">
+              </p-multiSelect>
+            </div>
+          </p-tabPanel>
+      
+        </p-tabView>
+      
+        <p-divider type="solid" />
+      
+        <ng-template pTemplate="footer">
+          <div class="flex justify-end gap-2">
+            <p-button severity="danger" label="İptal" icon="pi pi-times" (onClick)="displayDialog=false"></p-button>
+            <p-button severity="success" label="Kaydet" icon="pi pi-check" (onClick)="saveMenuItem()"></p-button>
+          </div>
+        </ng-template>      
+      </p-dialog>     
+  </div>
+  

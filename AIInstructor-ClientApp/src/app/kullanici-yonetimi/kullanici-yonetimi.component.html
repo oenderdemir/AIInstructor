@@ -1,0 +1,104 @@
+<div class="p-m-4">
+    <p-button *ngIf="authService.hasRole('KullaniciYonetimi.Manage')" label="Yeni Kullanıcı Ekle" icon="pi pi-plus" (onClick)="openNew()" severity="success"></p-button>
+
+    <p-divider></p-divider>
+
+    <p-toast />
+    <p-confirmdialog />
+
+    <p-table [value]="kullanicilar" tableStyleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Ad</th>
+          <th>Soyad</th>
+          <th>Email</th>
+          <th *ngIf="authService.hasRole('KullaniciYonetimi.Manage')">İşlemler</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-kullanici>
+        <tr>
+          <td>{{ kullanici.ad }}</td>
+          <td>{{ kullanici.soyad }}</td>
+          <td>{{ kullanici.email }}</td>
+          <td *ngIf="authService.hasRole('KullaniciYonetimi.Manage')">
+            <p-button icon="pi pi-pencil" (onClick)="editKullanici(kullanici)" class="p-button-sm" severity="info" [ngStyle]="{'padding': '0.1rem 0.1rem'}"></p-button>
+            <p-button icon="pi pi-trash" (onClick)="deleteKullanici(kullanici)" class="p-button-sm" severity="danger" [ngStyle]="{'padding': '0.1rem 0.1rem'}"></p-button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <p-dialog 
+  header="{{ isEditMode ? 'Kullanıcı Düzenle' : 'Yeni Kullanıcı Ekle' }}" 
+  [(visible)]="displayDialog" 
+  [modal]="true" 
+  [style]="{ width: '600px' }"
+  [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
+>
+
+  <p-tabView>
+
+    <!-- Kullanıcı Bilgileri Tab -->
+    <p-tabPanel header="Kullanıcı Bilgileri">
+      <div class="p-fluid formgrid grid p-3">
+        <div class="field col-6">
+          <label for="ad">Ad</label>
+          <input id="ad" pInputText [(ngModel)]="selectedKullanici.ad" class="w-full" />
+        </div>
+        <div class="field col-6">
+          <label for="soyad">Soyad</label>
+          <input id="soyad" pInputText [(ngModel)]="selectedKullanici.soyad" class="w-full" />
+        </div>
+        <div class="field col-12">
+          <label for="email">Email</label>
+          <input id="email" pInputText [(ngModel)]="selectedKullanici.email" class="w-full" />
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- Kullanıcı Grupları Tab -->
+    <p-tabPanel header="Kullanıcı Grupları">
+      <div class="p-fluid p-3">
+        <label for="kullaniciGruplar">Kullanıcı Grupları</label>
+        <p-multiSelect 
+          id="kullaniciGruplar"
+          [options]="allKullaniciGruplar" 
+          optionLabel="ad" 
+          optionValue="id" 
+          [(ngModel)]="selectedKullaniciGrupIds"
+          placeholder="Grup seçiniz"
+          class="w-full"
+          appendTo="body"
+          display="chip"
+        >
+        </p-multiSelect>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Kullanıcının Rolleri">
+        <div class="p-fluid p-3">
+          <ng-container *ngIf="seciliKullanicininRolleri.length > 0; else noRoles">
+            <div class="flex flex-wrap gap-2">
+              <p-chip *ngFor="let rol of seciliKullanicininRolleri" [label]="rol"></p-chip>
+            </div>
+          </ng-container>
+    
+          <ng-template #noRoles>
+            <p class="text-gray-500">Henüz seçilmiş bir rol bulunmamaktadır.</p>
+          </ng-template>
+        </div>
+      </p-tabPanel>
+  </p-tabView>
+
+  <p-divider></p-divider>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <p-button label="İptal" icon="pi pi-times" (onClick)="displayDialog = false" severity="secondary"></p-button>
+      <p-button label="Kaydet" icon="pi pi-check" (onClick)="saveKullanici()" severity="success"></p-button>
+    </div>
+  </ng-template>
+
+</p-dialog>
+
+</div>

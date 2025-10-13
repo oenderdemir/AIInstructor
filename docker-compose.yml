@@ -1,0 +1,72 @@
+networks:
+  vts-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "10.77.0.0/16"
+  
+services:
+  postgres:
+    image: postgres
+    container_name: postgres-container
+    restart: always
+    environment:
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: 1Q2w3e4r5t6y!!
+      POSTGRES_DB: VTSDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - C:\\vts\\postgres_data:/var/lib/postgresql/data
+    networks: [vts-net]
+  vts-fe:
+    build:
+      context: .
+      dockerfile: VTS-ClientApp/Dockerfile
+    ports:
+      - "4200:80" 
+      - "8100:80"
+    volumes:
+      - C:\\vts\\env\\env.js:/usr/share/nginx/html/assets/env.js
+
+    depends_on:
+      - vts-be
+    networks: [vts-net]
+
+  vts-be:
+    build: .
+    environment:
+      - ConnectionStrings__VTSDbConnection=Host=postgres;Port=5432;Username=sa;Password=1Q2w3e4r5t6y!!;Database=VTSDB
+      - Couchbase__ConnectionString=couchbase://cb01.internal,cb02.internal,cb03.internal
+      - Couchbase__Username=isp
+      - Couchbase__Password=ik2999
+      - Couchbase__BucketName=isp
+      - Couchbase__Scope=CAV
+      - Jwt__Key=JWTAuthenticationHIGHsecuredPasswordVVVp1OH7Xzyr
+      - Jwt__Issuer=VTSIssuer
+      - Jwt__Audience=VTSAudience
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
+      - App__Cors__AllowedOrigins__0=http://localhost:4200
+      - App__Cors__AllowedOrigins__1=http://localhost:8100
+      - App__SyncFromCB=true
+      - App__UploadDirectory=/mnt/vts/uploads
+      - App__Radius__ControllerAddress=https://172.18.94.12:443/RAI1
+      - App__Radius__ClientCertPath=
+      - App__Radius__HoldDuration=1
+      - App__Radius__PollInterval=15
+      - AllowedHosts=*
+    extra_hosts:
+      - "cb01.internal:192.168.110.10"
+      - "cb02.internal:192.168.110.11"
+      - "cb03.internal:192.168.110.12"
+    ports:
+      - "7215:8080"
+    volumes:
+      - C:\\vts\\vtsuploads:/mnt/vts/uploads
+      - C:\\vts\\certs:/mnt/vts/certs
+    depends_on:
+      - postgres
+
+    networks: [vts-net]
+

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "ade0a2e1-ec0b-4815-a4de-2b74868501da",
+    "name": "Mercedes Serie 001",
+    "tcuModels": [
+      "UNGBF65446"
+    ],
+    "brandId": "52f290f8-3710-44b9-9b51-1825fa345107",
+    "manufacturerId": "52f290f8-3710-44b9-9b51-1825fa345107",
+    "distributorId": "52f290f8-3710-44b9-9b51-1825fa345107",
+    "madeInCountryId": "bbed192c-b21c-4884-a539-ec8d6239469a",
+    "allowedCustomers": [
+      "60c98197-325a-4595-9f05-419c83301475"
+    ]
+  },
+  {
+    "id": "0d44b0d1-8fe7-4c42-bd39-4bf0dbf53ca5",
+    "name": "Aston Martin DB12 Series",
+    "tcuModels": [
+      "UNGBF65446"
+    ],
+    "brandId": "c940f9c1-2fa4-465d-9192-7019b7b8eb20",
+    "manufacturerId": "c940f9c1-2fa4-465d-9192-7019b7b8eb20",
+    "distributorId": "c940f9c1-2fa4-465d-9192-7019b7b8eb20",
+    "madeInCountryId": "bbed192c-b21c-4884-a539-ec8d6239469a",
+    "allowedCustomers": [
+      "60c98197-325a-4595-9f05-419c83301475"
+    ]
+  }
+]
