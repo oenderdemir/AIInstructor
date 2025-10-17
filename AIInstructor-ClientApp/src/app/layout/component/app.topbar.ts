@@ -6,12 +6,11 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AuthService } from '../../authentication/auth.service';
-import { CouchbaseHealthBadgeComponent } from '../../signalr/couchbase/couchbase-health-badge.component ';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator,CouchbaseHealthBadgeComponent],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -20,7 +19,7 @@ import { CouchbaseHealthBadgeComponent } from '../../signalr/couchbase/couchbase
             <a class="layout-topbar-logo" routerLink="/">
                     <img *ngIf= "layoutService.isDarkTheme()" src="assets/images/logo_dark.png" alt="Logo" class="mb-1" style="width: 70px; height: auto; object-fit: contain;">
                     <img *ngIf= "!layoutService.isDarkTheme()" src="assets/images/logo.png" alt="Logo" class="mb-1" style="width: 70px; height: auto; object-fit: contain;">
-                    <app-couchbase-health-badge/>
+                    
                 <span></span>
             </a>
         </div>

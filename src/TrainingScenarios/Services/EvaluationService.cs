@@ -37,7 +37,24 @@ public sealed class EvaluationService : IEvaluationService
             {
                 type = "json_object"
             },
-            AdditionalUserInstruction = "Senaryoyu değerlendir ve sadece geçerli JSON döndür."
+            AdditionalUserInstruction = @"
+                                        Senaryoyu değerlendir ve sadece aşağıdaki JSON yapısında geçerli bir nesne döndür:
+                                        {
+                                          ""scores"": {
+                                            ""communication"": <0-10 arasında bir sayı>,
+                                            ""problemSolving"": <0-10 arasında bir sayı>,
+                                            ""languageUse"": <0-10 arasında bir sayı>,
+                                            ""professionalism"": <0-10 arasında bir sayı>
+                                          },
+                                          ""overallScore"": <0-10 arasında bir sayı>,
+                                          ""feedback"": {
+                                            ""strengths"": [""güçlü yön 1"", ""güçlü yön 2"", ...],
+                                            ""improvements"": [""iyileştirme alanı 1"", ""iyileştirme alanı 2"", ...]
+                                          }
+                                        }
+
+                                        Yalnızca yukarıdaki formata tam uygun geçerli JSON döndür, Dil Türkçe olsun, açıklama veya metin ekleme.
+                                        "
         }, cancellationToken);
 
         try

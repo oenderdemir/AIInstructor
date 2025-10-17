@@ -1,0 +1,52 @@
+<h3>Senaryo Yönetimi</h3>
+
+<p-card *ngIf="!senaryoBasladi" header="Senaryoyu Başlat">
+  <div class="p-fluid">
+    <label for="ogrenciAdi">Öğrenci Adı</label>
+    <input id="ogrenciAdi" type="text" pInputText [(ngModel)]="ogrenciAdi" placeholder="Adınızı giriniz" />
+    <button pButton label="Senaryoyu Başlat" (click)="startScenario()" class="mt-3"></button>
+  </div>
+</p-card>
+
+<!-- 🗨️ Mesajlaşma Alanı -->
+<p-card *ngIf="senaryoBasladi && !evaluation">
+  <div *ngFor="let mesaj of mesajlar" [ngClass]="{
+        'sistem-msg': mesaj.rol === 'sistem',
+        'ogrenci-msg': mesaj.rol === 'öğrenci',
+        'asistan-msg': mesaj.rol === 'asistan'
+      }" class="msg-bubble">
+    <b>{{ mesaj.rol | titlecase }}:</b> {{ mesaj.icerik }}
+  </div>
+
+  <div class="p-fluid mt-3">
+    <textarea pInputTextarea [(ngModel)]="ogrenciMesaji" rows="3" placeholder="Mesajınızı yazın..."></textarea>
+    <button pButton label="İleri" icon="pi pi-send" (click)="ileri()" class="mt-2"></button>
+  </div>
+</p-card>
+
+<!-- 🏁 Evaluation Sonuçları -->
+<p-card *ngIf="evaluation" header="Senaryo Değerlendirmesi" styleClass="evaluation-card">
+  <div class="p-mb-2">
+    <strong>İletişim:</strong> {{ evaluation.communication }} / 10
+  </div>
+  <div class="p-mb-2">
+    <strong>Problem Çözme:</strong> {{ evaluation.problemSolving }} / 10
+  </div>
+  <div class="p-mb-2">
+    <strong>Dil Kullanımı:</strong> {{ evaluation.languageUse }} / 10
+  </div>
+  <div class="p-mb-2">
+    <strong>Profesyonellik:</strong> {{ evaluation.professionalism }} / 10
+  </div>
+  <div class="p-mb-2">
+    <strong>Genel Skor:</strong> {{ evaluation.overallScore }} / 10
+  </div>
+
+  <h4>Gelişim Alanları</h4>
+  <pre>{{ evaluation.improvementAreas }}</pre>
+
+  <h4>Güçlü Yönler</h4>
+  <pre>{{ evaluation.strengths || '—' }}</pre>
+
+
+</p-card>

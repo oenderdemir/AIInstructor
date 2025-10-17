@@ -1,0 +1,54 @@
+.chat-box {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.student-msg {
+  background: #d1e7dd;
+  padding: 0.5rem;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.assistant-msg {
+  background: #e7f1ff;
+  padding: 0.5rem;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.system-msg {
+  background: #fff3cd;
+  padding: 0.5rem;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.msg-bubble {
+  margin-bottom: 8px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.sistem-msg {
+  background: #fff4ce;
+}
+
+.ogrenci-msg {
+  background: #d4f3d4;
+}
+
+.asistan-msg {
+  background: #e0ebff;
+}
+
+.evaluation-card pre {
+  background: #f9f9f9;
+  padding: 8px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}

@@ -1,3 +1,4 @@
+using AIInstructor.src.Shared.Controller;
 using AIInstructor.src.TrainingScenarios.DTO;
 using AIInstructor.src.TrainingScenarios.Entity;
 using AIInstructor.src.TrainingScenarios.Repository;
@@ -6,9 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AIInstructor.src.TrainingScenarios.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public sealed class TrainingScenariosController : ControllerBase
+
+public sealed class TrainingScenariosController : UIController
 {
     private readonly IScenarioRepository _scenarioRepository;
     private readonly IScenarioSessionService _sessionService;

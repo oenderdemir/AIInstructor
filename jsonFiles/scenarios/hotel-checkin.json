@@ -5,7 +5,7 @@
   "language": "tr",
   "difficulty": "Orta",
   "tags": ["resepsiyon", "check-in", "iletişim"],
-  "maxTurns": 6,
+  "maxTurns": 2,
   "successCriteria": [
     "Müşteri ihtiyaçlarını aktif dinleme",
     "Oda seçeneklerini net bir şekilde açıklama",
@@ -17,7 +17,7 @@
     "Gerekirse üst satış fırsatlarını nazikçe önermek"
   ],
   "customerProfile": {
-    "name": "Emily Carter",
+    "name": "Ahmet Dönmez",
     "background": "İş seyahatinde olan, uzun uçuş sonrası otele geç gelen bir yönetici.",
     "personalityTraits": [
       "Yorgun",
