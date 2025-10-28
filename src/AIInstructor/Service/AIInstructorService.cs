@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using AIInstructor.src.AIInstructor.Entity;
 using AIInstructor.src.Gamification.Service;
-using AIInstructor.src.OgrenciSenaryo.Repository;
-using AIInstructor.src.SenaryoAdim.Repository;
+using AIInstructor.src.OgrenciSenaryolar.Repository;
+using AIInstructor.src.SenaryoAdimlar.Repository;
 using AIInstructor.src.Senaryolar.Repository;
 
 namespace AIInstructor.src.AIInstructor.Service

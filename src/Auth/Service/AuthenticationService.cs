@@ -101,14 +101,7 @@ namespace AIInstructor.src.Auth.Service
                     Roller = roles
                 };
 
-                if (!string.IsNullOrWhiteSpace(user.Rol))
-                {
-                    tokenRequest.RoleNames.Add(user.Rol);
-                }
-
-                tokenRequest.RoleNames.AddRange(roles
-                    .Where(r => string.Equals(r.Domain, "SystemRole", StringComparison.OrdinalIgnoreCase))
-                    .Select(r => r.Ad));
+             
 
                 var generatedTokenInformation = await tokenService.GenerateToken(tokenRequest);
 
@@ -153,14 +146,7 @@ namespace AIInstructor.src.Auth.Service
                 Roller = roles
             };
 
-            if (!string.IsNullOrWhiteSpace(user.Rol))
-            {
-                tokenRequest.RoleNames.Add(user.Rol);
-            }
-
-            tokenRequest.RoleNames.AddRange(roles
-                .Where(r => string.Equals(r.Domain, "SystemRole", StringComparison.OrdinalIgnoreCase))
-                .Select(r => r.Ad));
+            
 
             var tokenInfo = await tokenService.GenerateToken(tokenRequest);
 
@@ -168,10 +154,8 @@ namespace AIInstructor.src.Auth.Service
             {
                 Success = true,
                 Token = tokenInfo.Token,
-                ExpiresAt = tokenInfo.TokenExpireDate,
-                Role = !string.IsNullOrWhiteSpace(user.Rol)
-                    ? user.Rol
-                    : tokenRequest.RoleNames.FirstOrDefault() ?? string.Empty
+                ExpiresAt = tokenInfo.TokenExpireDate
+               
             };
         }
 
@@ -208,7 +192,7 @@ namespace AIInstructor.src.Auth.Service
                 Soyad = request.Soyad,
                 Email = request.Email,
                 ParolaHash = passwordHash,
-                Rol = request.Role,
+               
                 Durum = "Aktif",
                 Status = enumKullaniciStatus.Standart
             };

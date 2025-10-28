@@ -10,9 +10,9 @@ using AIInstructor.src.Roller.Entity;
 using AIInstructor.src.Shared.CurrentUser.Service;
 using AIInstructor.src.Shared.RDBMS.Entity;
 using AIInstructor.src.Senaryolar.Entity;
-using AIInstructor.src.AIKisiOzellik.Entity;
-using AIInstructor.src.SenaryoAdim.Entity;
-using AIInstructor.src.OgrenciSenaryo.Entity;
+using AIInstructor.src.AIKisiOzellikler.Entity;
+using AIInstructor.src.SenaryoAdimlar.Entity;
+using AIInstructor.src.OgrenciSenaryolar.Entity;
 using AIInstructor.src.AIInstructor.Entity;
 using AIInstructor.src.Gamification.Entity;
 
@@ -106,7 +106,7 @@ namespace AIInstructor.src.Context
             {
                 entity.HasIndex(e => e.KullaniciAdi).IsUnique();
                 entity.Property(e => e.TCNO).HasMaxLength(11);
-                entity.Property(e => e.Rol).HasMaxLength(100);
+
                 entity.Property(e => e.Durum).HasMaxLength(50);
                 entity.Property(e => e.IsDeleted).HasDefaultValue(false);
             });
