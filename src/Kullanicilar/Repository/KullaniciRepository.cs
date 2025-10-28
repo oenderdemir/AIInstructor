@@ -17,5 +17,10 @@ namespace AIInstructor.src.Kullanicilar.Repository
         {
             return await base.FirstOrDefaultAsync(e=>e.KullaniciAdi.Equals(kullaniciAdi));
         }
+
+        public async Task<Kullanici?> GetByEmailAsync(string email)
+        {
+            return await base.FirstOrDefaultAsync(e => e.Email != null && e.Email.Equals(email));
+        }
     }
 }

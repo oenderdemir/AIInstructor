@@ -41,9 +41,10 @@ namespace AIInstructor.src.Context
 
                     new Rol { Ad = "View", Domain = "MenuYonetimi", CreatedAt = DateTime.UtcNow },
                     new Rol { Ad = "Manage", Domain = "MenuYonetimi", CreatedAt = DateTime.UtcNow },
-
-                    
-
+                    new Rol { Ad = "AIKisi", Domain = "SystemRole", CreatedAt = DateTime.UtcNow },
+                    new Rol { Ad = "AIInstructor", Domain = "SystemRole", CreatedAt = DateTime.UtcNow },
+                    new Rol { Ad = "DersYetkilisi", Domain = "SystemRole", CreatedAt = DateTime.UtcNow },
+                    new Rol { Ad = "Ogrenci", Domain = "SystemRole", CreatedAt = DateTime.UtcNow },
                 });
 
                 await context.SaveChangesAsync();
@@ -54,9 +55,11 @@ namespace AIInstructor.src.Context
                 context.Set<Kullanici>().AddRange(new List<Kullanici>
                 {
                     new Kullanici { Ad="admin",Soyad="kullanicisi",TCNO="23868366202",KullaniciAdi="admin",Email="admin@test.test",AvatarPath=" ",
-                    IsDeleted=false},
+                    ParolaHash = "4DFF4EA340F0A823F15D3F4F01AB62EAE0E5DA579CCB851F8DB9DFE84C58B2B37B89903A740E1EE172DA793A6E79D560E5F7F9BD058A12A280433ED6FA46510A",
+                    Rol = "DersYetkilisi", Durum = "Aktif", IsDeleted=false},
                     new Kullanici { Ad="test",Soyad="kullanicisi",TCNO="13868366208",KullaniciAdi="test",Email="test@test.test",AvatarPath=" ",
-                    IsDeleted=false}
+                    ParolaHash = "4DFF4EA340F0A823F15D3F4F01AB62EAE0E5DA579CCB851F8DB9DFE84C58B2B37B89903A740E1EE172DA793A6E79D560E5F7F9BD058A12A280433ED6FA46510A",
+                    Rol = "Ogrenci", Durum = "Aktif", IsDeleted=false}
 
                 });
 

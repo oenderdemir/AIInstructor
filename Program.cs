@@ -10,6 +10,7 @@ using Serilog;
 using Serilog.Enrichers.CallerInfo;
 using System.Net;
 using System.Reflection;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using AIInstructor.src.Context;
@@ -22,6 +23,7 @@ using AIInstructor.src.Shared.Middleware;
 using AIInstructor.src.Shared.SignalRHubs;
 using AIInstructor.src.TrainingScenarios.Repository;
 using AIInstructor.src.TrainingScenarios.Services;
+using AIInstructor.src.Gamification.Settings;
 
 
 Log.Logger = new LoggerConfiguration()
@@ -96,6 +98,7 @@ builder.Services.AddMemoryCache();
 
 builder.Services.Configure<OpenAIOptions>(configuration.GetSection("OpenAI"));
 builder.Services.Configure<ScenarioDataOptions>(configuration.GetSection("ScenarioData"));
+builder.Services.Configure<GamificationSettings>(configuration.GetSection("Gamification"));
 
 builder.Services.AddSingleton<IScenarioRepository, FileSystemScenarioRepository>();
 builder.Services.AddSingleton<IGamificationService, GamificationService>();
@@ -162,6 +165,22 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.Zero,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        RoleClaimType = ClaimTypes.Role
+    };
+})
 .AddJwtBearer("UIScheme", o =>
 {
 
@@ -175,7 +194,8 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ClockSkew = TimeSpan.Zero,
-        IssuerSigningKey = new SymmetricSecurityKey(key)
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        RoleClaimType = ClaimTypes.Role
     };
 })
 .AddJwtBearer("ServiceScheme", o =>
@@ -191,7 +211,8 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ClockSkew = TimeSpan.Zero,
-        IssuerSigningKey = new SymmetricSecurityKey(key)
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        RoleClaimType = ClaimTypes.Role
     };
 });
 
@@ -202,6 +223,13 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("ServicePolicy", policy =>
         policy.RequireAuthenticatedUser().RequireClaim("permission", "KullaniciTipi.Admin", "KullaniciTipi.ServiceUser").AddAuthenticationSchemes("ServiceScheme"));
+
+
+    options.AddPolicy("InstructorPolicy", policy =>
+        policy.RequireRole("DersYetkilisi"));
+
+    options.AddPolicy("StudentPolicy", policy =>
+        policy.RequireRole("Ogrenci"));
 
 
 });

@@ -1,7 +1,6 @@
-import { Injectable, signal, effect, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { MenuService } from '../menu/menu.service';
 import { HttpClient } from '@angular/common/http';
+import { inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { environment } from '../../enviroments/environment';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from "jwt-decode";
@@ -22,15 +21,20 @@ export class AuthService {
 
 
   constructor(private router: Router) {
-    this.addActivityListeners(); 
+    this.addActivityListeners();
+    if (this.isAuthenticated()) {
+      this.userRoles.set(this.getUserRoles());
+    }
   }
 
   login(username: string, password: string) : Observable<any> {
 
     return this.http.post(this.baseUrl+"/Auth/login",{"kullaniciAdi":username,"parola":password}).pipe(
-      tap(response => {
-       
-        
+      tap((response: any) => {
+        if (response?.authToken) {
+          localStorage.setItem(this.tokenKey, response.authToken);
+          this.userRoles.set(this.getUserRoles());
+        }
 
         this.isAuthenticated.set(true);
         this.resetInactivityTimer();
@@ -98,9 +102,32 @@ logout() {
     return [];
   }
 
-  hasRole(role: string): boolean {
-    const permissions = this.getUserPermissions();
+  getUserRoles(): string[] {
+    const token = localStorage.getItem(this.tokenKey);
+    if (!token) {
+      return [];
+    }
 
-    return permissions.includes(role)||permissions.includes("KullaniciTipi.Admin");
+    const decodedToken: any = jwtDecode(token);
+    const roles = decodedToken['role'];
+    if (Array.isArray(roles)) {
+      return roles;
+    }
+
+    if (typeof roles === 'string') {
+      return [roles];
+    }
+
+    return [];
+  }
+
+  hasRole(role: string): boolean {
+    const roles = this.getUserRoles();
+    return roles.includes(role);
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    const userRoles = this.getUserRoles();
+    return roles.some(role => userRoles.includes(role));
   }
 }

@@ -1,10 +1,13 @@
 ﻿using Azure.Core;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using AIInstructor.src.Auth.DTO;
 using AIInstructor.src.KullaniciGrupRoller.Repository;
 using AIInstructor.src.KullaniciKullaniciGruplar.Repository;
+using AIInstructor.src.Kullanicilar.Entity;
 using AIInstructor.src.Kullanicilar.Repository;
 using AIInstructor.src.Roller.Entity;
 using AIInstructor.src.Shared.CurrentUser.Service;
@@ -47,14 +50,14 @@ namespace AIInstructor.src.Auth.Service
             var userName=currentUserService.GetCurrentUsername();
             var user = await this.kullaniciRepository.GetByKullaniciAdiAsync(userName);
             var hashedCurrentPassword = await this.hashService.ComputeHash(model.CurrentPassword);
-            if(user.Parola!=hashedCurrentPassword)
+            if(user.ParolaHash!=hashedCurrentPassword)
             {
                 throw new Exception("Hatali Parola");
             }
 
             var newHashedPassword = await this.hashService.ComputeHash(model.NewPassword);
 
-            user.Parola=newHashedPassword;
+            user.ParolaHash=newHashedPassword;
             user.Status=enumKullaniciStatus.Standart;
 
             await this.kullaniciRepository.SaveChangesAsync();
@@ -70,7 +73,7 @@ namespace AIInstructor.src.Auth.Service
             {
                 throw new ArgumentNullException(nameof(request));
             }
-           
+
             var user = await this.kullaniciRepository.GetByKullaniciAdiAsync(request.KullaniciAdi);
 
 
@@ -80,28 +83,34 @@ namespace AIInstructor.src.Auth.Service
                 response.AuthenticateResult = false;
                 response.AuthToken = string.Empty;
             }
-            else if (hashedPassword != user.Parola)
+            else if (hashedPassword != user.ParolaHash)
             {
                 response.AuthenticateResult = false;
                 response.AuthToken = string.Empty;
             }
             else
             {
-                var kullaniciGruplar = await this.kullaniciKullaniciGrupRepository.Where(e => e.Kullanici == user,e=>e.Include(x=>x.KullaniciGrup))
-                    .Select(e=>e.KullaniciGrup).ToListAsync();
+                var roles = await GetRollerAsync(user);
 
-                List<Rol> roles = new List<Rol>();
-
-                foreach (var kullaniciGrup in kullaniciGruplar)
+                var tokenRequest = new GenerateTokenRequest
                 {
-                    var roller=await this.kullaniciGrupRolRepository.Where(e => e.KullaniciGrup == kullaniciGrup, q => q.Include(x => x.Rol))
-                                                              .Select(e=>e.Rol).ToListAsync();
-                    roles.AddRange(roller);
+                    KullaniciAdi = user.KullaniciAdi,
+                    Ad = user.Ad,
+                    Soyad = user.Soyad,
+                    EMail = user.Email,
+                    Roller = roles
+                };
+
+                if (!string.IsNullOrWhiteSpace(user.Rol))
+                {
+                    tokenRequest.RoleNames.Add(user.Rol);
                 }
 
-               
-                //userRoles.ForEach(ur => roles.Add("roleismi"));
-                var generatedTokenInformation = await tokenService.GenerateToken(new GenerateTokenRequest { KullaniciAdi = user.KullaniciAdi, Ad = user.Ad, Soyad = user.Soyad, EMail = user.Email, Roller = roles });
+                tokenRequest.RoleNames.AddRange(roles
+                    .Where(r => string.Equals(r.Domain, "SystemRole", StringComparison.OrdinalIgnoreCase))
+                    .Select(r => r.Ad));
+
+                var generatedTokenInformation = await tokenService.GenerateToken(tokenRequest);
 
                 response.AccessTokenExpireDate = DateTime.UtcNow.AddHours(8);
                 response.AuthenticateResult = true;
@@ -112,6 +121,129 @@ namespace AIInstructor.src.Auth.Service
 
 
             return await Task.FromResult(response);
+        }
+
+        public async Task<ApiLoginResponseDto> LoginAsync(ApiLoginRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            var user = await kullaniciRepository.GetByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return new ApiLoginResponseDto { Success = false };
+            }
+
+            var hashedPassword = await hashService.ComputeHash(request.Password);
+            if (!string.Equals(user.ParolaHash, hashedPassword, StringComparison.Ordinal))
+            {
+                return new ApiLoginResponseDto { Success = false };
+            }
+
+            var roles = await GetRollerAsync(user);
+
+            var tokenRequest = new GenerateTokenRequest
+            {
+                KullaniciAdi = user.KullaniciAdi,
+                Ad = user.Ad,
+                Soyad = user.Soyad,
+                EMail = user.Email,
+                Roller = roles
+            };
+
+            if (!string.IsNullOrWhiteSpace(user.Rol))
+            {
+                tokenRequest.RoleNames.Add(user.Rol);
+            }
+
+            tokenRequest.RoleNames.AddRange(roles
+                .Where(r => string.Equals(r.Domain, "SystemRole", StringComparison.OrdinalIgnoreCase))
+                .Select(r => r.Ad));
+
+            var tokenInfo = await tokenService.GenerateToken(tokenRequest);
+
+            return new ApiLoginResponseDto
+            {
+                Success = true,
+                Token = tokenInfo.Token,
+                ExpiresAt = tokenInfo.TokenExpireDate,
+                Role = !string.IsNullOrWhiteSpace(user.Rol)
+                    ? user.Rol
+                    : tokenRequest.RoleNames.FirstOrDefault() ?? string.Empty
+            };
+        }
+
+        public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            var allowedRoles = new[] { "DersYetkilisi", "Ogrenci" };
+            if (!allowedRoles.Contains(request.Role, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Rol geçersiz", nameof(request.Role));
+            }
+
+            var existingUser = await kullaniciRepository.GetByEmailAsync(request.Email);
+            if (existingUser != null)
+            {
+                return new RegisterResponseDto
+                {
+                    Success = false,
+                    Message = "Kullanıcı zaten kayıtlı."
+                };
+            }
+
+            var passwordHash = await hashService.ComputeHash(request.Password);
+
+            var newUser = new Kullanici
+            {
+                Id = Guid.NewGuid(),
+                KullaniciAdi = request.Email,
+                Ad = request.Ad,
+                Soyad = request.Soyad,
+                Email = request.Email,
+                ParolaHash = passwordHash,
+                Rol = request.Role,
+                Durum = "Aktif",
+                Status = enumKullaniciStatus.Standart
+            };
+
+            await kullaniciRepository.AddAsync(newUser);
+            await kullaniciRepository.SaveChangesAsync();
+
+            return new RegisterResponseDto
+            {
+                Success = true,
+                KullaniciId = newUser.Id,
+                Message = "Kullanıcı başarıyla oluşturuldu."
+            };
+        }
+
+        private async Task<List<Rol>> GetRollerAsync(Kullanici user)
+        {
+            var kullaniciGruplar = await this.kullaniciKullaniciGrupRepository
+                .Where(e => e.Kullanici == user, e => e.Include(x => x.KullaniciGrup))
+                .Select(e => e.KullaniciGrup)
+                .ToListAsync();
+
+            List<Rol> roles = new List<Rol>();
+
+            foreach (var kullaniciGrup in kullaniciGruplar)
+            {
+                var roller = await this.kullaniciGrupRolRepository
+                    .Where(e => e.KullaniciGrup == kullaniciGrup, q => q.Include(x => x.Rol))
+                    .Select(e => e.Rol)
+                    .ToListAsync();
+
+                roles.AddRange(roller);
+            }
+
+            return roles;
         }
 
         public async Task<LoginResponseDTO> LogoutAsync()

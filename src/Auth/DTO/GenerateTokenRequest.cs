@@ -10,10 +10,12 @@ namespace AIInstructor.src.Auth.DTO
         public string EMail { get; set; }
 
         public List<Rol> Roller { get; set; }
+        public List<string> RoleNames { get; set; }
 
         public GenerateTokenRequest()
         {
             Roller = new List<Rol>();
+            RoleNames = new List<string>();
         }
     }
 }

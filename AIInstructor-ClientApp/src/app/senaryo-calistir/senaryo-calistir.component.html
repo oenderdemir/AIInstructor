@@ -1,0 +1,20 @@
+<p-card header="Senaryo Çalıştır">
+  <div class="chat-window">
+    <div class="message" *ngFor="let message of messages" [ngClass]="message.sender">
+      <span>{{ message.content }}</span>
+    </div>
+  </div>
+
+  <div class="input-row">
+    <textarea pInputTextarea [(ngModel)]="currentMessage" rows="3" placeholder="Yanıtınızı yazın..."></textarea>
+    <button pButton type="button" label="Gönder" icon="pi pi-send" (click)="sendMessage()"></button>
+  </div>
+</p-card>
+
+<p-dialog header="AI Instructor" [(visible)]="evaluationVisible" [modal]="true" [dismissableMask]="true">
+  <p *ngIf="evaluationBadge">Rozet: {{ evaluationBadge }}</p>
+  <p *ngIf="evaluationScore !== undefined">Puan: {{ evaluationScore }}</p>
+  <ul>
+    <li *ngFor="let hint of hints">{{ hint }}</li>
+  </ul>
+</p-dialog>
