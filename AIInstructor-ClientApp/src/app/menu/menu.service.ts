@@ -12,8 +12,9 @@ import { MenuItemDto } from '../menu-yonetimi/menu-item.model';
   providedIn: 'root'
 })
 export class MenuService {
-  menuItems = signal<MenuItemModel[]>([]); 
+  menuItems = signal<MenuItemModel[]>([]);
   userRoles = signal<string[]>([]);
+  userPermissions = signal<string[]>([]);
 
   constructor(private authService: AuthService,private http: HttpClient) {
     //this.userRoles.set(this.authService.getUserPermissions());
@@ -22,7 +23,8 @@ export class MenuService {
     // AuthService içindeki authChanged event'ini dinle
     effect(() => {
       if (this.authService.authChanged()) {
-        this.userRoles.set(this.authService.getUserPermissions());
+        this.userRoles.set(this.authService.getUserRoles());
+        this.userPermissions.set(this.authService.getUserPermissions());
         this.loadMenu();
       }
     });
@@ -47,7 +49,7 @@ export class MenuService {
       label: menuItem.label,
       icon: menuItem.icon,
       routerLink: menuItem.routerLink,
-      roles: menuItem.roles?.map(role => `${role.domain}.${role.ad}`) || [],
+      roles: menuItem.roles?.map(role => role.domain === 'SystemRole' ? role.ad : `${role.domain}.${role.ad}`) || [],
       items: menuItem.items ? this.mapMenuItems(menuItem.items) : undefined  // 👈 Alt menüler için recursive map
     }));
   }
@@ -58,13 +60,18 @@ export class MenuService {
   }
 
   hasPermission(menuRoles?: string[]): boolean {
-    if (this.userRoles().includes('KullaniciTipi.Admin')) {
+    if (this.userPermissions().includes('KullaniciTipi.Admin')) {
       return true; // Eğer kullanıcı "admin" ise her şeyi görebilir
     }
 
     if (!menuRoles || menuRoles.length === 0) {
       return true; // Eğer öğenin belirli bir rol gereksinimi yoksa herkese göster
     }
+    const hasPermission = menuRoles.some(role => this.userPermissions().includes(role));
+    if (hasPermission) {
+      return true;
+    }
+
     let hasRole=menuRoles.some(role => this.userRoles().includes(role));
       return hasRole; // Kullanıcının herhangi bir rolü eşleşiyorsa göster
   }

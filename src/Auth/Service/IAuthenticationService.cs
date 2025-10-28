@@ -8,6 +8,8 @@ namespace AIInstructor.src.Auth.Service
     {
         Task<LoginResponseDTO> ChangePassword(ChangePasswordRequestDTO model);
         Task<LoginResponseDTO> LoginAsync(LoginRequestDTO request);
+        Task<ApiLoginResponseDto> LoginAsync(ApiLoginRequestDto request);
+        Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request);
         Task<LoginResponseDTO> LogoutAsync();
     }
 }

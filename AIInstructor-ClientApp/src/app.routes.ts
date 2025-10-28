@@ -11,6 +11,8 @@ import { RolYonetimiComponent } from './app/rol-yonetimi/rol-yonetimi.component'
 import { ResetPasswordComponent } from './app/reset-password/reset-password.component';
 
 import { SenaryoYonetimiComponent } from './app/senaryo-yonetimi/senaryo-yonetimi.component';
+import { SenaryoSecimiComponent } from './app/senaryo-secimi/senaryo-secimi.component';
+import { SenaryoCalistirComponent } from './app/senaryo-calistir/senaryo-calistir.component';
 
 export const appRoutes: Routes = [
     {
@@ -21,10 +23,12 @@ export const appRoutes: Routes = [
             { path: 'menuler', component: MenuYonetimiComponent },
             { path: 'kullanicilar', component: KullaniciYonetimiComponent },
             { path: 'kullanici-gruplar', component: KullaniciGrupYonetimiComponent },
-            { path: 'roller', component: RolYonetimiComponent }, 
- {path: 'demo-senaryo', component:SenaryoYonetimiComponent},
-           
-        ], canActivate: [AuthGuard] 
+            { path: 'roller', component: RolYonetimiComponent },
+            { path: 'demo-senaryo', component: SenaryoYonetimiComponent, data: { roles: ['DersYetkilisi'] } },
+            { path: 'senaryo-secimi', component: SenaryoSecimiComponent, data: { roles: ['Ogrenci', 'DersYetkilisi'] } },
+            { path: 'senaryo-calistir/:id', component: SenaryoCalistirComponent, data: { roles: ['Ogrenci', 'DersYetkilisi'] } },
+
+        ], canActivate: [AuthGuard], canActivateChild: [AuthGuard]
     },
    
     { path: 'login', component: LoginComponent },

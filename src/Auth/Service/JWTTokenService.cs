@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using AIInstructor.src.Auth.DTO;
@@ -40,6 +41,14 @@ namespace AIInstructor.src.Auth.Service
                 claims.Add(new Claim("permission", $"{r.Domain}.{r.Ad}"));
                 if (r.Ad == "Manage")
                     claims.Add(new Claim("permission", $"{r.Domain}.View"));
+            }
+
+            foreach (var roleName in request.RoleNames.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                if (!string.IsNullOrWhiteSpace(roleName))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, roleName));
+                }
             }
 
             var jwt = new JwtSecurityToken(

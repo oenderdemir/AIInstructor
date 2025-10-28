@@ -24,10 +24,12 @@ namespace AIInstructor.src.Kullanicilar.Entity
 
         public string? Email { get; set; }
 
+        public string Rol { get; set; } = string.Empty;
 
-        //1
-        public string Parola { get; set; } = "4DFF4EA340F0A823F15D3F4F01AB62EAE0E5DA579CCB851F8DB9DFE84C58B2B37B89903A740E1EE172DA793A6E79D560E5F7F9BD058A12A280433ED6FA46510A";
-  
+        public string ParolaHash { get; set; } = "4DFF4EA340F0A823F15D3F4F01AB62EAE0E5DA579CCB851F8DB9DFE84C58B2B37B89903A740E1EE172DA793A6E79D560E5F7F9BD058A12A280433ED6FA46510A";
+
+        public string Durum { get; set; } = "Aktif";
+
         public string? AvatarPath { get; set; }
 
         public enumKullaniciStatus Status { get; set; }=enumKullaniciStatus.SifreDegistirmeli;

@@ -9,6 +9,12 @@ using AIInstructor.src.MenuItemRoller.Entity;
 using AIInstructor.src.Roller.Entity;
 using AIInstructor.src.Shared.CurrentUser.Service;
 using AIInstructor.src.Shared.RDBMS.Entity;
+using AIInstructor.src.Senaryolar.Entity;
+using AIInstructor.src.AIKisiOzellik.Entity;
+using AIInstructor.src.SenaryoAdim.Entity;
+using AIInstructor.src.OgrenciSenaryo.Entity;
+using AIInstructor.src.AIInstructor.Entity;
+using AIInstructor.src.Gamification.Entity;
 
 namespace AIInstructor.src.Context
 {
@@ -74,6 +80,13 @@ namespace AIInstructor.src.Context
         public DbSet<KullaniciGrupRol> KullaniciGrupRoller { get; set; }
         public DbSet<MenuItem> MenuItemler { get; set; }
         public DbSet<MenuItemRol> MenuItemRoller { get; set; }
+        public DbSet<Senaryo> Senaryolar { get; set; }
+        public DbSet<AIKisiOzellik> AIKisiOzellikler { get; set; }
+        public DbSet<SenaryoAdim> SenaryoAdimlar { get; set; }
+        public DbSet<OgrenciSenaryo> OgrenciSenaryolar { get; set; }
+        public DbSet<AIInstructorSession> AIInstructorSessions { get; set; }
+        public DbSet<AIInstructorStepFeedback> AIInstructorStepFeedbackler { get; set; }
+        public DbSet<GamificationResult> GamificationResults { get; set; }
     
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -93,12 +106,40 @@ namespace AIInstructor.src.Context
             {
                 entity.HasIndex(e => e.KullaniciAdi).IsUnique();
                 entity.Property(e => e.TCNO).HasMaxLength(11);
+                entity.Property(e => e.Rol).HasMaxLength(100);
+                entity.Property(e => e.Durum).HasMaxLength(50);
                 entity.Property(e => e.IsDeleted).HasDefaultValue(false);
             });
 
             modelBuilder.Entity<KullaniciGrup>(entity =>
             {
                 entity.HasIndex(e => e.Ad).IsUnique();
+            });
+
+            modelBuilder.Entity<Senaryo>(entity =>
+            {
+                entity.HasMany(e => e.Ozellikler)
+                      .WithOne(e => e.Senaryo!)
+                      .HasForeignKey(e => e.SenaryoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(e => e.Adimlar)
+                      .WithOne(e => e.Senaryo!)
+                      .HasForeignKey(e => e.SenaryoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<OgrenciSenaryo>(entity =>
+            {
+                entity.HasIndex(e => new { e.OgrenciId, e.SenaryoId }).IsUnique();
+            });
+
+            modelBuilder.Entity<AIInstructorStepFeedback>(entity =>
+            {
+                entity.HasOne<AIInstructorSession>()
+                      .WithMany(e => e.GeriBildirimler)
+                      .HasForeignKey(e => e.AIInstructorSessionId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             
