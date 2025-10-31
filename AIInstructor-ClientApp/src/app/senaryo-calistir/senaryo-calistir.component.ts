@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputTextarea } from 'primeng/inputtextarea';
 import { SenaryoCalistirService } from './senaryo-calistir.service';
 import { Subscription } from 'rxjs';
 
@@ -17,7 +17,7 @@ interface ChatMessage {
 @Component({
   selector: 'app-senaryo-calistir',
   standalone: true,
-  imports: [CommonModule, FormsModule, CardModule, InputTextareaModule, ButtonModule, DialogModule],
+  imports: [CommonModule, FormsModule, CardModule, InputTextarea, ButtonModule, DialogModule],
   templateUrl: './senaryo-calistir.component.html',
   styleUrls: ['./senaryo-calistir.component.scss']
 })

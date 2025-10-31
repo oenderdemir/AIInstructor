@@ -102,14 +102,14 @@ namespace AIInstructor.src.Context
                 entity.Property(e => e.IsDeleted).HasDefaultValue(false);
             });
 
-            modelBuilder.Entity<Kullanici>(entity =>
+            modelBuilder.Entity<Kullanici>((Action<Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<Kullanici>>)(entity =>
             {
                 entity.HasIndex(e => e.KullaniciAdi).IsUnique();
-                entity.Property(e => e.TCNO).HasMaxLength(11);
+                entity.Property((Expression<Func<Kullanici, string?>>)(e => e.TCNO)).HasMaxLength(11);
 
-                entity.Property(e => e.Durum).HasMaxLength(50);
+              
                 entity.Property(e => e.IsDeleted).HasDefaultValue(false);
-            });
+            }));
 
             modelBuilder.Entity<KullaniciGrup>(entity =>
             {

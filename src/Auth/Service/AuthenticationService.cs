@@ -50,14 +50,14 @@ namespace AIInstructor.src.Auth.Service
             var userName=currentUserService.GetCurrentUsername();
             var user = await this.kullaniciRepository.GetByKullaniciAdiAsync(userName);
             var hashedCurrentPassword = await this.hashService.ComputeHash(model.CurrentPassword);
-            if(user.ParolaHash!=hashedCurrentPassword)
+            if(user.Parola!=hashedCurrentPassword)
             {
                 throw new Exception("Hatali Parola");
             }
 
             var newHashedPassword = await this.hashService.ComputeHash(model.NewPassword);
 
-            user.ParolaHash=newHashedPassword;
+            user.Parola=newHashedPassword;
             user.Status=enumKullaniciStatus.Standart;
 
             await this.kullaniciRepository.SaveChangesAsync();
@@ -83,7 +83,7 @@ namespace AIInstructor.src.Auth.Service
                 response.AuthenticateResult = false;
                 response.AuthToken = string.Empty;
             }
-            else if (hashedPassword != user.ParolaHash)
+            else if (hashedPassword != user.Parola)
             {
                 response.AuthenticateResult = false;
                 response.AuthToken = string.Empty;
@@ -130,7 +130,7 @@ namespace AIInstructor.src.Auth.Service
             }
 
             var hashedPassword = await hashService.ComputeHash(request.Password);
-            if (!string.Equals(user.ParolaHash, hashedPassword, StringComparison.Ordinal))
+            if (!string.Equals(user.Parola, hashedPassword, StringComparison.Ordinal))
             {
                 return new ApiLoginResponseDto { Success = false };
             }
@@ -166,11 +166,7 @@ namespace AIInstructor.src.Auth.Service
                 throw new ArgumentNullException(nameof(request));
             }
 
-            var allowedRoles = new[] { "DersYetkilisi", "Ogrenci" };
-            if (!allowedRoles.Contains(request.Role, StringComparer.OrdinalIgnoreCase))
-            {
-                throw new ArgumentException("Rol geçersiz", nameof(request.Role));
-            }
+           
 
             var existingUser = await kullaniciRepository.GetByEmailAsync(request.Email);
             if (existingUser != null)
@@ -191,9 +187,9 @@ namespace AIInstructor.src.Auth.Service
                 Ad = request.Ad,
                 Soyad = request.Soyad,
                 Email = request.Email,
-                ParolaHash = passwordHash,
+                Parola = passwordHash,
                
-                Durum = "Aktif",
+             
                 Status = enumKullaniciStatus.Standart
             };
 

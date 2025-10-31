@@ -55,11 +55,11 @@ namespace AIInstructor.src.Context
                 context.Set<Kullanici>().AddRange(new List<Kullanici>
                 {
                     new Kullanici { Ad="admin",Soyad="kullanicisi",TCNO="23868366202",KullaniciAdi="admin",Email="admin@test.test",AvatarPath=" ",
-                    ParolaHash = "4DFF4EA340F0A823F15D3F4F01AB62EAE0E5DA579CCB851F8DB9DFE84C58B2B37B89903A740E1EE172DA793A6E79D560E5F7F9BD058A12A280433ED6FA46510A"
-                   , Durum = "Aktif", IsDeleted=false},
+                    Parola = "4DFF4EA340F0A823F15D3F4F01AB62EAE0E5DA579CCB851F8DB9DFE84C58B2B37B89903A740E1EE172DA793A6E79D560E5F7F9BD058A12A280433ED6FA46510A"
+                  , IsDeleted=false},
                     new Kullanici { Ad="test",Soyad="kullanicisi",TCNO="13868366208",KullaniciAdi="test",Email="test@test.test",AvatarPath=" ",
-                    ParolaHash = "4DFF4EA340F0A823F15D3F4F01AB62EAE0E5DA579CCB851F8DB9DFE84C58B2B37B89903A740E1EE172DA793A6E79D560E5F7F9BD058A12A280433ED6FA46510A"
-                   , Durum = "Aktif", IsDeleted=false}
+                    Parola = "4DFF4EA340F0A823F15D3F4F01AB62EAE0E5DA579CCB851F8DB9DFE84C58B2B37B89903A740E1EE172DA793A6E79D560E5F7F9BD058A12A280433ED6FA46510A"
+                   , IsDeleted=false}
 
                 });
 
